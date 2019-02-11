@@ -1,4 +1,3 @@
-
 from tkinter import *
 import string
 import itertools
@@ -6,18 +5,22 @@ import itertools
 result = ""
 normal_form_1 = ""
 normal_form_2 = ""
+list1 = []
+list2 = []
 alphabet = list(string.ascii_letters)
 symbol_lexique = ["(", ")", " ", "&", "|", "-"]
 all_symbol = symbol_lexique + alphabet
 check_count = 0
 nb_variable = 0
+count_variable1 = []
+count_variable2 = []
 
 
 def check():
-    global nb_variable
-    global check_count
-    global normal_form_1
-    global normal_form_2
+    """
+
+    """
+    global nb_variable, check_count, normal_form_1, normal_form_2, list1, list2, count_variable2, count_variable1
 
     if check_count == 0:
         normal_form_1 = str(logic1.get())
@@ -25,22 +28,25 @@ def check():
         list1 = list(normal_form_1)
         list2 = list(normal_form_2)
 
-        count_variable1 = []
-        count_variable2 = []
-
         for letter in alphabet:
             if normal_form_1.count(letter) > 0:
                 count_variable1.append(str(letter))
             if normal_form_2.count(letter) > 0:
                 count_variable2.append(str(letter))
-        logic1.set(str(count_variable1))
-        logic2.set(str(count_variable2))
+
+        #logic1.set(str(count_variable1))
+        #logic2.set(str(count_variable2))
+        #print(count_variable1)
+        #print(count_variable2)
+
         if len(count_variable1) != len(count_variable2):
             logic1.set("bad Entry, different number of variable, the first one has " + str(count_variable1) +
                        " variables")
             logic2.set("bad Entry, different number of variable, the second one has " + str(count_variable2) +
                        " variables")
         else:
+
+            # faire exception si espace entre negation et variable
             for symbol in list1:
                 if symbol not in all_symbol:
                     logic1.set("bad Entry, unresolved symbol : " + symbol)
@@ -58,21 +64,74 @@ def check():
                 nb_variable = len(count_variable1)
         check_count += 1
     else:
+        # si entrée différent d'avant on peut refaire check ( pas fait )
         logic1.set("the inspection has already been done")
         logic2.set("the inspection has already been done")
 
 
-def compare():
-    logic1.set(normal_form_1)
-    logic2.set(normal_form_2)
-    bool = [0, 1]
-    logic_table = list(itertools.product('01', repeat=nb_variable))
-    logicResult.set(logic_table[0])
+def format_logic(logic_string):
+    """
 
+    :param logic_string:
+    :return:
+    """
+    logic_string_copy = logic_string.replace("&", "*").replace("|", "+")
+    return logic_string_copy
+
+
+def compare():
+    """
+    """
+    if check_count > 0:
+        logic1.set(normal_form_1)
+        logic2.set(normal_form_2)
+        bool = [0, 1]
+        logic_table_instance = list(itertools.product('01', repeat=nb_variable))
+
+        print(logic_table_instance)
+
+        normal_form_1_format = format_logic(normal_form_1)
+        normal_form_2_format = format_logic(normal_form_2)
+
+        print(normal_form_1, id(normal_form_1))
+        print(normal_form_1_format, id(normal_form_1_format))
+        print(normal_form_2, id(normal_form_2))
+        print(normal_form_2_format, id(normal_form_2_format))
+
+        truth_table_list = []
+        for e in range(0, len(logic_table_instance)):
+            normal_form_1_format_copy = normal_form_1_format
+            normal_form_2_format_copy = normal_form_2_format
+            for i in range(0, len(count_variable1)):
+                normal_form_1_format_copy = normal_form_1_format_copy.replace(count_variable1[i],
+                                                                              logic_table_instance[e][i])
+                normal_form_2_format_copy = normal_form_2_format_copy.replace(count_variable1[i],
+                                                                              logic_table_instance[e][i])
+
+            normal_form_1_format_copy_final = normal_form_1_format_copy.replace("-0", "1").replace("-1", "0")
+            normal_form_2_format_copy_final = normal_form_2_format_copy.replace("-0", "1").replace("-1", "0")
+
+            truth_table_list.append((logic_table_instance[e], eval(normal_form_1_format_copy_final),
+                                     eval(normal_form_2_format_copy_final)))
+
+            print(normal_form_1_format_copy_final, normal_form_2_format_copy_final)
+        print(truth_table_list)
+
+        logicResult.set("They're equal")
+        for test in range(0, len(truth_table_list)):
+            if truth_table_list[test][1] != truth_table_list[test][2]:
+                logicResult.set("Not Equal")
+                break
+            else:
+                continue
+
+
+
+    else:
+        logicResult.set("check not done")
 
 
 if __name__ == "__main__":
-
     gui = Tk()
     gui.configure(background="light blue")
     gui.title("Logic Comparator Pro")
@@ -86,15 +145,15 @@ if __name__ == "__main__":
     logic_entry1 = Entry(gui, bg="white", fg="black", textvariable=logic1).pack(fill=BOTH)
     name_label2 = Label(gui, text="Logic Proposition 2", pady=10, bg="light grey", relief='raised').pack(fill=BOTH)
     logic_entry2 = Entry(gui, bg="white", fg="black", textvariable=logic2).pack(fill=BOTH)
-    bouton_check = Button(gui, text=' Check ', fg='white', bg='blue', bd=4, command=lambda: check())\
+    bouton_check = Button(gui, text=' Check ', fg='white', bg='blue', bd=4, command=lambda: check()) \
         .pack(fill=BOTH, padx=350, pady=5)
-    bouton_compare = Button(gui, text=' Compare ', fg='white', bg='green', bd=4, command=lambda: compare())\
+    bouton_compare = Button(gui, text=' Compare ', fg='white', bg='green', bd=4, command=lambda: compare()) \
         .pack(fill=BOTH, padx=350, pady=5)
 
     logic_entry3 = Entry(gui, bg="white", fg="black", textvariable=logicResult).pack(fill=BOTH, padx=350)
     logic1.set('enter your first logic expression')
     logic2.set('enter your second logic expression')
-    logic1.set('(b & a) | (c & a)')
-    logic2.set('(b | c) & a')
+    #logic1.set('(b & -a) | (c & -a)')
+    #logic2.set('(b | c) & -a')
 
     gui.mainloop()
