@@ -8,12 +8,14 @@ normal_form_2 = ""
 list1 = []
 list2 = []
 alphabet = list(string.ascii_letters)
-symbol_lexique = ["(", ")", " ", "&", "|", "-"]
+symbol_lexique = ['(', ')', ' ', '&', '|', '-', '¬', '∨', '∧']
 all_symbol = symbol_lexique + alphabet
 check_count = 0
 nb_variable = 0
 count_variable1 = []
 count_variable2 = []
+#print(eval("(1 & 0) | (1 & 1) "))
+#print(all_symbol)
 
 
 def check():
@@ -22,11 +24,28 @@ def check():
     """
     global nb_variable, check_count, normal_form_1, normal_form_2, list1, list2, count_variable2, count_variable1
 
+    logicResult.set("")
+
     if check_count == 0:
+        count_variable1 = []
+        count_variable2 = []
+        count_bad_1 = []
+        count_bad_2 = []
         normal_form_1 = str(logic1.get())
         normal_form_2 = str(logic2.get())
         list1 = list(normal_form_1)
         list2 = list(normal_form_2)
+        print(list1)
+        print(list2)
+
+        for l in range(0, len(list1)):
+            if list1[l] not in all_symbol:
+                count_bad_1.append(list1[l])
+
+        for l in range(0, len(list2)):
+            if list2[l] not in all_symbol:
+                count_bad_2.append(list2[l])
+
 
         for letter in alphabet:
             if normal_form_1.count(letter) > 0:
@@ -34,39 +53,33 @@ def check():
             if normal_form_2.count(letter) > 0:
                 count_variable2.append(str(letter))
 
-        #logic1.set(str(count_variable1))
-        #logic2.set(str(count_variable2))
-        #print(count_variable1)
-        #print(count_variable2)
-
         if len(count_variable1) != len(count_variable2):
-            logic1.set("bad Entry, different number of variable, the first one has " + str(count_variable1) +
+            logic1.set("bad Entry, different number of variable : " + str(count_variable1) +
                        " variables")
-            logic2.set("bad Entry, different number of variable, the second one has " + str(count_variable2) +
+            logic2.set("bad Entry, different number of variable : " + str(count_variable2) +
                        " variables")
+
+        elif len(set(count_variable1).intersection(set(count_variable2))) != len(count_variable1):
+            logic1.set("bad Entry, not the same variable : " + str(count_variable1))
+            logic2.set("bad Entry, not the same variable : " + str(count_variable2))
+
+        elif len(count_bad_1) > 0 or len(count_bad_2) > 0:
+            logic1.set("bad Entry, unresolved symbol : " + str(count_bad_1))
+            logic2.set("bad Entry, unresolved symbol : " + str(count_bad_2))
+
         else:
-
-            # faire exception si espace entre negation et variable
-            for symbol in list1:
-                if symbol not in all_symbol:
-                    logic1.set("bad Entry, unresolved symbol : " + symbol)
-            for symbol in list2:
-                if symbol not in all_symbol:
-                    logic2.set("bad Entry, unresolved symbol : " + symbol)
-            set_1, set_2 = set(count_variable1), set(count_variable2)
-
-            if len(set_1.intersection(set_2)) != len(count_variable1):
-                logic1.set("bad Entry, not the same variable : " + str(count_variable1))
-                logic2.set("bad Entry, not the same variable : " + str(count_variable2))
-            else:
-                logic1.set("Entry ok")
-                logic2.set("Entry ok")
-                nb_variable = len(count_variable1)
-        check_count += 1
+            logic1.set("Entry ok")
+            logic2.set("Entry ok")
+            nb_variable = len(count_variable1)
+            check_count += 1
     else:
-        # si entrée différent d'avant on peut refaire check ( pas fait )
-        logic1.set("the inspection has already been done")
-        logic2.set("the inspection has already been done")
+        if (normal_form_1 == str(logic1.get()) and normal_form_2 == str(logic2.get())) or logic1.get() == "Entry ok" \
+                or logic1.get() == "the inspection has already been done":
+            logic1.set("the inspection has already been done")
+            logic2.set("the inspection has already been done")
+        else:
+            check_count = 0
+            check()
 
 
 def format_logic(logic_string):
@@ -75,8 +88,20 @@ def format_logic(logic_string):
     :param logic_string:
     :return:
     """
-    logic_string_copy = logic_string.replace("&", "*").replace("|", "+")
+    logic_string_copy = logic_string.replace("&", "*").replace("|", "+").replace("∨", "+").replace("∧", "*")
     return logic_string_copy
+
+
+def reset():
+    logic1.set('enter your first logic expression')
+    logic2.set('enter your second logic expression')
+    logicResult.set("")
+    normal_form_1 = ""
+    normal_form_2 = ""
+    list1 = []
+    list2 = []
+    count_variable1 = []
+    count_variable2 = []
 
 
 def compare():
@@ -85,7 +110,6 @@ def compare():
     if check_count > 0:
         logic1.set(normal_form_1)
         logic2.set(normal_form_2)
-        bool = [0, 1]
         logic_table_instance = list(itertools.product('01', repeat=nb_variable))
 
         print(logic_table_instance)
@@ -108,8 +132,17 @@ def compare():
                 normal_form_2_format_copy = normal_form_2_format_copy.replace(count_variable1[i],
                                                                               logic_table_instance[e][i])
 
-            normal_form_1_format_copy_final = normal_form_1_format_copy.replace("-0", "1").replace("-1", "0")
-            normal_form_2_format_copy_final = normal_form_2_format_copy.replace("-0", "1").replace("-1", "0")
+            normal_form_1_format_copy_final = normal_form_1_format_copy.replace("-0", "1").replace("-1", "0")\
+                .replace("- 0", "1").replace("- 1", "0")
+            normal_form_2_format_copy_final = normal_form_2_format_copy.replace("-0", "1").replace("-1", "0")\
+                .replace("- 0", "1").replace("- 1", "0")
+
+            try:
+                eval(normal_form_1_format_copy_final)
+                eval(normal_form_2_format_copy_final)
+            except SyntaxError:
+                logic1.set("Syntax Error, no operator between variables")
+                logic2.set("Syntax Error, no operator between variables")
 
             truth_table_list.append((logic_table_instance[e], eval(normal_form_1_format_copy_final),
                                      eval(normal_form_2_format_copy_final)))
@@ -124,9 +157,6 @@ def compare():
                 break
             else:
                 continue
-
-
-
     else:
         logicResult.set("check not done")
 
@@ -151,9 +181,12 @@ if __name__ == "__main__":
         .pack(fill=BOTH, padx=350, pady=5)
 
     logic_entry3 = Entry(gui, bg="white", fg="black", textvariable=logicResult).pack(fill=BOTH, padx=350)
+
+    bouton_compare = Button(gui, text=' Reset ', fg='white', bg='red', bd=4, command=lambda: reset()) \
+        .pack(fill=BOTH, padx=350, pady=5)
     logic1.set('enter your first logic expression')
     logic2.set('enter your second logic expression')
-    #logic1.set('(b & -a) | (c & -a)')
-    #logic2.set('(b | c) & -a')
+    logic1.set('(b & - a) | (c & -a)')
+    logic2.set('(b | c) & -a')
 
     gui.mainloop()
