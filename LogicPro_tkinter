@@ -14,13 +14,14 @@ check_count = 0
 nb_variable = 0
 count_variable1 = []
 count_variable2 = []
-#print(eval("(1 & 0) | (1 & 1) "))
-#print(all_symbol)
+truth_table_list = []
 
 
 def check():
     """
-
+    This is the check function called by the check button
+    The goal of this function is to check if the 2 inputs (the 2 logical expressions)
+    are valid syntaxicaly and lexicaly
     """
     global nb_variable, check_count, normal_form_1, normal_form_2, list1, list2, count_variable2, count_variable1
 
@@ -45,7 +46,6 @@ def check():
         for l in range(0, len(list2)):
             if list2[l] not in all_symbol:
                 count_bad_2.append(list2[l])
-
 
         for letter in alphabet:
             if normal_form_1.count(letter) > 0:
@@ -84,15 +84,24 @@ def check():
 
 def format_logic(logic_string):
     """
+    This is the format_logic function called in the function compare()
+    The goal is to return the 2 inputs gived by the user(s)
+    The return is different than the input
+    where the caracter is not valid for a logic evaluation
 
     :param logic_string:
-    :return:
+    :return: String
     """
-    logic_string_copy = logic_string.replace("&", "*").replace("|", "+").replace("∨", "+").replace("∧", "*")
+    logic_string_copy = logic_string.replace("∧", "&").replace("∨", "|").replace("¬", "-")
     return logic_string_copy
 
 
 def reset():
+    """
+    This is the reset function called by the reset button
+    The goal of this function is to reset all the value calculate or implemented as empty
+    or in the initial state of the application
+    """
     logic1.set('enter your first logic expression')
     logic2.set('enter your second logic expression')
     logicResult.set("")
@@ -106,6 +115,9 @@ def reset():
 
 def compare():
     """
+    This is the compare function called in the compare button.
+    The goal of this fucntion is to compare the 2 inputs and give the result to
+    the user(s). The 2 inputs need to be checked before compared
     """
     if check_count > 0:
         logic1.set(normal_form_1)
@@ -122,7 +134,7 @@ def compare():
         print(normal_form_2, id(normal_form_2))
         print(normal_form_2_format, id(normal_form_2_format))
 
-        truth_table_list = []
+        global truth_table_list
         for e in range(0, len(logic_table_instance)):
             normal_form_1_format_copy = normal_form_1_format
             normal_form_2_format_copy = normal_form_2_format
@@ -182,11 +194,13 @@ if __name__ == "__main__":
 
     logic_entry3 = Entry(gui, bg="white", fg="black", textvariable=logicResult).pack(fill=BOTH, padx=350)
 
-    bouton_compare = Button(gui, text=' Reset ', fg='white', bg='red', bd=4, command=lambda: reset()) \
+    bouton_reset = Button(gui, text=' Reset ', fg='white', bg='red', bd=4, command=lambda: reset()) \
         .pack(fill=BOTH, padx=350, pady=5)
+
+    #result = Label(gui, text="", pady=100, bg="light grey", relief='raised').pack(fill=X)
     logic1.set('enter your first logic expression')
     logic2.set('enter your second logic expression')
-    logic1.set('(b & - a) | (c & -a)')
-    logic2.set('(b | c) & -a')
+    #logic1.set('(b & - a) | (c & -a)')
+    #logic2.set('(b | c) & -a')
 
     gui.mainloop()
