@@ -82,6 +82,19 @@ def check():
             check()
 
 
+def true_table_canvas(table):
+    """
+    This is the true_table_canvas called in the compare function
+    if the comparaison was made and a result is gived
+    :param table:
+    """
+    canvas = Canvas(gui, width=250, height=250, background='white')
+    ligne1 = canvas.create_line(75, 0, 75, 120)
+    ligne2 = canvas.create_line(0, 60, 150, 60)
+    txt = canvas.create_text(10, 10, text="Cible", font="Arial 12 italic", fill="blue")
+    canvas.pack()
+
+
 def format_logic(logic_string):
     """
     This is the format_logic function called in the function compare()
@@ -169,6 +182,9 @@ def compare():
                 break
             else:
                 continue
+
+        true_table_canvas(truth_table_list)
+
     else:
         logicResult.set("check not done")
 
@@ -200,7 +216,7 @@ if __name__ == "__main__":
     #result = Label(gui, text="", pady=100, bg="light grey", relief='raised').pack(fill=X)
     logic1.set('enter your first logic expression')
     logic2.set('enter your second logic expression')
-    #logic1.set('(b & - a) | (c & -a)')
-    #logic2.set('(b | c) & -a')
+    logic1.set('(b & - a) | (c & -a)')
+    logic2.set('(b | c) & -a')
 
     gui.mainloop()
