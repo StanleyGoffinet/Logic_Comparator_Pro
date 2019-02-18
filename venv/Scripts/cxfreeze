@@ -1,0 +1,6 @@
+#!C:\Projet_fin_cycle\venv\Scripts\python.exe
+
+from cx_Freeze import main
+
+main()
+
