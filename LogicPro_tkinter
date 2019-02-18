@@ -36,8 +36,8 @@ def check():
         normal_form_2 = str(logic2.get())
         list1 = list(normal_form_1)
         list2 = list(normal_form_2)
-        print(list1)
-        print(list2)
+        #print(list1)
+        #print(list2)
 
         for l in range(0, len(list1)):
             if list1[l] not in all_symbol:
@@ -88,11 +88,23 @@ def true_table_canvas(table):
     if the comparaison was made and a result is gived
     :param table:
     """
-    canvas = Canvas(gui, width=250, height=250, background='white')
-    ligne1 = canvas.create_line(75, 0, 75, 120)
-    ligne2 = canvas.create_line(0, 60, 150, 60)
-    txt = canvas.create_text(10, 10, text="Cible", font="Arial 12 italic", fill="blue")
-    canvas.pack()
+
+    mylist.insert(END, 'Here is the table of truth found :')
+    start_table_string = ""
+    for var in range(nb_variable):
+        start_table_string = start_table_string + "          " + str(count_variable1[var])
+    start_table_string += "          Logic_1_value          Logic_2_value"
+    mylist.insert(END, start_table_string)
+
+    for line in range(len(table)):
+        table_string_value = ""
+        for var in range(nb_variable):
+            table_string_value = table_string_value + "          " + str(table[line][0][var])
+
+        table_string_value += "                      " + str(table[line][1]) + "                                 " + str(table[line][2])
+        mylist.insert(END, table_string_value)
+    mylist.pack(fill=BOTH)
+    scrollbar.config(command=mylist.yview)
 
 
 def format_logic(logic_string):
@@ -115,6 +127,8 @@ def reset():
     The goal of this function is to reset all the value calculate or implemented as empty
     or in the initial state of the application
     """
+    global nb_variable, check_count, normal_form_1, normal_form_2, list1, list2, count_variable2, count_variable1,\
+        truth_table_list
     logic1.set('enter your first logic expression')
     logic2.set('enter your second logic expression')
     logicResult.set("")
@@ -124,6 +138,11 @@ def reset():
     list2 = []
     count_variable1 = []
     count_variable2 = []
+    truth_table_list = []
+    check_count = 0
+    nb_variable = 0
+
+    #print(truth_table_list)
 
 
 def compare():
@@ -132,22 +151,24 @@ def compare():
     The goal of this fucntion is to compare the 2 inputs and give the result to
     the user(s). The 2 inputs need to be checked before compared
     """
+    global truth_table_list, check_count
     if check_count > 0:
+
+        truth_table_list = []
         logic1.set(normal_form_1)
         logic2.set(normal_form_2)
         logic_table_instance = list(itertools.product('01', repeat=nb_variable))
 
-        print(logic_table_instance)
+        #print(logic_table_instance)
 
         normal_form_1_format = format_logic(normal_form_1)
         normal_form_2_format = format_logic(normal_form_2)
 
-        print(normal_form_1, id(normal_form_1))
-        print(normal_form_1_format, id(normal_form_1_format))
-        print(normal_form_2, id(normal_form_2))
-        print(normal_form_2_format, id(normal_form_2_format))
+        #print(normal_form_1, id(normal_form_1))
+        #print(normal_form_1_format, id(normal_form_1_format))
+        #print(normal_form_2, id(normal_form_2))
+        #print(normal_form_2_format, id(normal_form_2_format))
 
-        global truth_table_list
         for e in range(0, len(logic_table_instance)):
             normal_form_1_format_copy = normal_form_1_format
             normal_form_2_format_copy = normal_form_2_format
@@ -172,8 +193,8 @@ def compare():
             truth_table_list.append((logic_table_instance[e], eval(normal_form_1_format_copy_final),
                                      eval(normal_form_2_format_copy_final)))
 
-            print(normal_form_1_format_copy_final, normal_form_2_format_copy_final)
-        print(truth_table_list)
+            #print(normal_form_1_format_copy_final, normal_form_2_format_copy_final)
+        #print(truth_table_list)
 
         logicResult.set("They're equal")
         for test in range(0, len(truth_table_list)):
@@ -184,16 +205,17 @@ def compare():
                 continue
 
         true_table_canvas(truth_table_list)
+        check_count = 0
 
     else:
-        logicResult.set("check not done")
+        logicResult.set("Check not done")
 
 
 if __name__ == "__main__":
     gui = Tk()
     gui.configure(background="light blue")
     gui.title("Logic Comparator Pro")
-    gui.geometry("800x400")
+    gui.geometry("800x500")
 
     logic1 = StringVar()
     logic2 = StringVar()
@@ -213,10 +235,15 @@ if __name__ == "__main__":
     bouton_reset = Button(gui, text=' Reset ', fg='white', bg='red', bd=4, command=lambda: reset()) \
         .pack(fill=BOTH, padx=350, pady=5)
 
-    #result = Label(gui, text="", pady=100, bg="light grey", relief='raised').pack(fill=X)
-    logic1.set('enter your first logic expression')
-    logic2.set('enter your second logic expression')
-    logic1.set('(b & - a) | (c & -a)')
-    logic2.set('(b | c) & -a')
+    scrollbar = Scrollbar(gui)
+    scrollbar.pack(fill=BOTH)
+    mylist = Listbox(gui, yscrollcommand=scrollbar.set)
 
+    logic1.set('Enter your first logic expression')
+    logic2.set('Enter your second logic expression')
+    #logic1.set('(b & - a) | (c & -a)')
+    #logic2.set('(b | c) & -a')
+    logic1.set('(b ∧ ¬ a) ∨ (c ∧ ¬a)')
+    logic2.set('(b ∨ c) ∧ ¬a')
+    #'∨', '∧' ¬
     gui.mainloop()
