@@ -26,7 +26,7 @@ def check():
     global nb_variable, check_count, normal_form_1, normal_form_2, list1, list2, count_variable2, count_variable1
 
     logicResult.set("")
-    print(check_count)
+    #print(check_count)
 
     if check_count == 0:
         count_variable1 = []
@@ -192,23 +192,26 @@ def compare():
                                                                               logic_table_instance[e][i])
 
             normal_form_1_format_copy_final = normal_form_1_format_copy.replace("-0", "1").replace("-1", "0")\
-                .replace("- 0", "1").replace("- 1", "0")
+                .replace("- 0", "1").replace("- 1", "0").replace("&", " and ").replace("|", " or ").replace("-", " not ")
             normal_form_2_format_copy_final = normal_form_2_format_copy.replace("-0", "1").replace("-1", "0")\
-                .replace("- 0", "1").replace("- 1", "0")
+                .replace("- 0", "1").replace("- 1", "0").replace("&", " and ").replace("|", " or ").replace("-", " not ")
+
 
             try:
+                #print(normal_form_1_format_copy_final)
+                #print(normal_form_2_format_copy_final)
                 eval(normal_form_1_format_copy_final)
                 eval(normal_form_2_format_copy_final)
             except SyntaxError:
                 logic1.set("Syntax Error")
                 logic2.set("Syntax Error")
 
-            truth_table_list.append((logic_table_instance[e], eval(normal_form_1_format_copy_final),
-                                     eval(normal_form_2_format_copy_final)))
+            truth_table_list.append((logic_table_instance[e], int(eval(normal_form_1_format_copy_final)),
+                                     int(eval(normal_form_2_format_copy_final))))
 
             #print(normal_form_1_format_copy_final, normal_form_2_format_copy_final)
         #print(truth_table_list)
-
+        print(truth_table_list)
         logicResult.set("They're equal")
         for test in range(0, len(truth_table_list)):
             if truth_table_list[test][1] != truth_table_list[test][2]:
